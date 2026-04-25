@@ -22,9 +22,8 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<OrderResponse> placeOrder(@RequestBody OrderRequest request) {
-        log.info("Received order request for product: {}", request.getProductCode());
-        OrderResponse response = orderService.placeOrder(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        log.info("New order request: product={}, qty={}", request.getProductCode(), request.getQuantity());
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrder(request));
     }
 
     @GetMapping
@@ -35,13 +34,30 @@ public class OrderController {
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrderById(
             @PathVariable("id") Long id) {
+
         return ResponseEntity.ok(orderService.getOrderById(id));
+    }
+
+    @GetMapping("/number/{orderNumber}")
+    public ResponseEntity<OrderResponse> getByOrderNumber(
+            @PathVariable("orderNumber") String orderNumber) {
+
+        return ResponseEntity.ok(orderService.getOrderByNumber(orderNumber));
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<OrderResponse> updateStatus(
             @PathVariable("id") Long id,
             @RequestParam("status") Order.OrderStatus status) {
+
         return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> cancelOrder(
+            @PathVariable("id") Long id) {
+
+        orderService.cancelOrder(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,4 +1,4 @@
-package com.example.orderservice.exception;
+package com.example.inventoryservice.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,6 +18,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException ex) {
         log.warn("Resource not found: {}", ex.getMessage());
         return buildError(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<Map<String, Object>> handleStock(InsufficientStockException ex) {
+        log.warn("Insufficient stock: {}", ex.getMessage());
+        return buildError(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

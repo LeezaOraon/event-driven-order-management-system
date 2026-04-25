@@ -2,6 +2,7 @@ package com.example.orderservice.service;
 
 import com.example.orderservice.dto.OrderRequest;
 import com.example.orderservice.dto.OrderResponse;
+import com.example.orderservice.exception.ResourceNotFoundException;
 import com.example.orderservice.model.Order;
 import com.example.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,8 @@ public class OrderService {
 
     @Transactional
     public OrderResponse placeOrder(OrderRequest request) {
+        validateRequest(request);
+
         Order order = Order.builder()
                 .orderNumber(UUID.randomUUID().toString())
                 .productCode(request.getProductCode())
@@ -32,7 +35,9 @@ public class OrderService {
                 .build();
 
         Order saved = orderRepository.save(order);
-        log.info("Order placed successfully: {}", saved.getOrderNumber());
+
+        log.info("Order placed: {} for product {}", saved.getOrderNumber(), saved.getProductCode());
+
         return mapToResponse(saved);
     }
 
@@ -47,16 +52,59 @@ public class OrderService {
     @Transactional(readOnly = true)
     public OrderResponse getOrderById(Long id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
+
+        return mapToResponse(order);
+    }
+
+    @Transactional(readOnly = true)
+    public OrderResponse getOrderByNumber(String orderNumber) {
+        Order order = orderRepository.findByOrderNumber(orderNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + orderNumber));
+
         return mapToResponse(order);
     }
 
     @Transactional
     public OrderResponse updateOrderStatus(Long id, Order.OrderStatus status) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
+
         order.setStatus(status);
+
+        log.info("Order {} status updated to {}", order.getOrderNumber(), status);
+
         return mapToResponse(orderRepository.save(order));
+    }
+
+    @Transactional
+    public void cancelOrder(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
+
+        if (order.getStatus() == Order.OrderStatus.SHIPPED ||
+                order.getStatus() == Order.OrderStatus.DELIVERED) {
+            throw new IllegalArgumentException("Cannot cancel order in status: " + order.getStatus());
+        }
+
+        order.setStatus(Order.OrderStatus.CANCELLED);
+        orderRepository.save(order);
+
+        log.info("Order {} cancelled", order.getOrderNumber());
+    }
+
+    private void validateRequest(OrderRequest request) {
+        if (request.getProductCode() == null || request.getProductCode().isBlank()) {
+            throw new IllegalArgumentException("Product code is required");
+        }
+
+        if (request.getQuantity() == null || request.getQuantity() <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than 0");
+        }
+
+        if (request.getUnitPrice() == null || request.getUnitPrice().signum() <= 0) {
+            throw new IllegalArgumentException("Unit price must be greater than 0");
+        }
     }
 
     private OrderResponse mapToResponse(Order order) {

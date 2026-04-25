@@ -30,7 +30,8 @@ public class InventoryController {
     }
 
     @GetMapping("/{productCode}")
-    public ResponseEntity<InventoryResponse> getByProductCode(@PathVariable String productCode) {
+    public ResponseEntity<InventoryResponse> getByProductCode(
+            @PathVariable("productCode") String productCode) {
         return ResponseEntity.ok(inventoryService.getByProductCode(productCode));
     }
 
@@ -45,8 +46,25 @@ public class InventoryController {
 
     @PatchMapping("/{productCode}/stock")
     public ResponseEntity<InventoryResponse> updateStock(
-            @PathVariable String productCode,
-            @RequestParam Integer quantity) {
+            @PathVariable("productCode") String productCode,
+            @RequestParam("quantity") Integer quantity) {
+
         return ResponseEntity.ok(inventoryService.updateStock(productCode, quantity));
+    }
+
+    @PostMapping("/{productCode}/reserve")
+    public ResponseEntity<InventoryResponse> reserveStock(
+            @PathVariable("productCode") String productCode,
+            @RequestParam("quantity") Integer quantity) {
+
+        return ResponseEntity.ok(inventoryService.reserveStock(productCode, quantity));
+    }
+
+    @PostMapping("/{productCode}/release")
+    public ResponseEntity<InventoryResponse> releaseStock(
+            @PathVariable("productCode") String productCode,
+            @RequestParam("quantity") Integer quantity) {
+
+        return ResponseEntity.ok(inventoryService.releaseStock(productCode, quantity));
     }
 }
