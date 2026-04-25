@@ -33,14 +33,15 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long id) {
+    public ResponseEntity<OrderResponse> getOrderById(
+            @PathVariable("id") Long id) {
         return ResponseEntity.ok(orderService.getOrderById(id));
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<OrderResponse> updateStatus(
-            @PathVariable Long id,
-            @RequestParam Order.OrderStatus status) {
+            @PathVariable("id") Long id,
+            @RequestParam("status") Order.OrderStatus status) {
         return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
     }
 }

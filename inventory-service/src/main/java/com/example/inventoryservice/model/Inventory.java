@@ -28,7 +28,9 @@ public class Inventory {
     @Column(nullable = false)
     private Integer reservedQuantity;
 
-    public Integer getAvailableQuantity() {
-        return this.quantity - this.reservedQuantity;
+    public int getAvailableQuantity() {
+        int qty = (quantity != null) ? quantity : 0;
+        int reserved = (reservedQuantity != null) ? reservedQuantity : 0;
+        return qty - reserved;
     }
 }

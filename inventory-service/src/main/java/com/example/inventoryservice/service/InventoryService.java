@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -33,15 +36,15 @@ public class InventoryService {
     }
 
     @Transactional(readOnly = true)
-    public StockCheckResponse checkStock(String productCode, Integer requestedQuantity) {
+    public StockCheckResponse checkStock(String productCode, Integer quantity) {
         Inventory inventory = inventoryRepository.findByProductCode(productCode)
                 .orElseThrow(() -> new RuntimeException("Product not found: " + productCode));
         int available = inventory.getAvailableQuantity();
         return StockCheckResponse.builder()
                 .productCode(productCode)
-                .available(available >= requestedQuantity)
+                .available(available >= quantity)
                 .availableQuantity(available)
-                .requestedQuantity(requestedQuantity)
+                .requestedQuantity(quantity)
                 .build();
     }
 
@@ -66,7 +69,12 @@ public class InventoryService {
     public InventoryResponse getByProductCode(String productCode) {
         return inventoryRepository.findByProductCode(productCode)
                 .map(this::mapToResponse)
-                .orElseThrow(() -> new RuntimeException("Product not found: " + productCode));
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Product not found: " + productCode
+                        )
+                );
     }
 
     private InventoryResponse mapToResponse(Inventory inv) {

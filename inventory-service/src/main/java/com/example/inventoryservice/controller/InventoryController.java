@@ -36,8 +36,9 @@ public class InventoryController {
 
     @GetMapping("/check/{productCode}")
     public ResponseEntity<StockCheckResponse> checkStock(
-            @PathVariable String productCode,
-            @RequestParam Integer quantity) {
+            @PathVariable("productCode") String productCode,
+            @RequestParam("quantity") Integer quantity) {
+
         log.info("Checking stock for {} qty {}", productCode, quantity);
         return ResponseEntity.ok(inventoryService.checkStock(productCode, quantity));
     }
