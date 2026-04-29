@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
-@Configuration
+//@Configuration
 public class RateLimiterConfig {
 
     /**

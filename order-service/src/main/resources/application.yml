@@ -19,6 +19,8 @@ server:
 #        format_sql: true
 
 spring:
+  application:
+    name: order-service
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver

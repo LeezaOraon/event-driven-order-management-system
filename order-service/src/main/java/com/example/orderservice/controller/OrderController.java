@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
@@ -20,6 +21,9 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    @Value("${server.port}")
+    private String port;
+
     @PostMapping
     public ResponseEntity<OrderResponse> placeOrder(@RequestBody OrderRequest request) {
         log.info("New order request: product={}, qty={}", request.getProductCode(), request.getQuantity());
@@ -28,6 +32,7 @@ public class OrderController {
 
     @GetMapping
     public ResponseEntity<List<OrderResponse>> getAllOrders() {
+        log.info("Serving from port : {}", port);
         return ResponseEntity.ok(orderService.getAllOrders());
     }
 
