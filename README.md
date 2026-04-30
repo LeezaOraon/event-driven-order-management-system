@@ -1,6 +1,6 @@
 # Distributed Order Management System(DOMS)
 
-> A production-grade distributed e-commerce backend built with Spring Boot 3 and Spring Cloud. Five independent microservices communicate through synchronous REST and asynchronous Kafka events, implementing a choreography-based saga pattern for distributed transactions.
+> Event-driven microservices architecture using Kafka, Saga pattern, and Spring Cloud
 
 ---
 
