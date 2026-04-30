@@ -93,8 +93,8 @@ order-service (CANCELLED) + inventory-service (release stock)
 ### 1. Clone repo
 
 ```
-git clone https://github.com/LeezaOraon/event-driven-order-management-system
-cd event-driven-order-management-system
+git clone https://github.com/LeezaOraon/distributed-order-management-system.git
+cd distributed-order-management-system.git
 ```
 
 ---
